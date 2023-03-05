@@ -1,0 +1,27 @@
+binary_semaphore w; //0 -> writing not permitted, 1 -> writing permitted
+
+binary_semaphore ww; //ww = 0 -> a writer is waiting
+
+counting_semaphore r; //indicate number of processes reading
+
+write(){ 
+	wait(ww);
+	wait(w); //tell that writing has started
+	while(r->count != 0)
+		;
+	signal(ww);
+	//do the writing
+	signal(w);
+}
+
+read()
+{
+	wait(ww);
+	wait(w);
+	signal(ww); //wait and signal on ww are done to replace a while loop
+	signal(r); //increment r
+	//do the reading
+	wait(r); //decrement r
+	if (r->count == 0)
+		signal(w);
+}
